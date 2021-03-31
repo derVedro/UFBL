@@ -1,5 +1,9 @@
 #include "Label_Solver.h"
-#include <intrin0.h>
+#include <stddef.h>
+#include <stdint.h>
+#define __int64 long long
+
+
 struct Run {
 	unsigned short start_pos;
 	unsigned short end_pos;
@@ -47,7 +51,7 @@ inline void CCL_BMRS_X64_FindRuns(const unsigned __int64* bits_start, const unsi
 	unsigned long basepos = 0, bitpos = 0;
 	for (;; runs++) {
 		//find starting position
-		while (!_BitScanForward64(&bitpos, working_bits)) {
+		while (!working_bits) {
 			bits++, basepos += 64;
 			if (bits == bit_final) {
 				runs->start_pos = (short)0xFFFF;
@@ -57,14 +61,16 @@ inline void CCL_BMRS_X64_FindRuns(const unsigned __int64* bits_start, const unsi
 			}
 			working_bits = *bits;
 		}
+        bitpos = __builtin_ctzll(working_bits);
 		runs->start_pos = short(basepos + bitpos);
 
 		//find ending position
 		working_bits = (~working_bits) & (0xFFFFFFFFFFFFFFFF << bitpos);
-		while (!_BitScanForward64(&bitpos, working_bits)) {
+		while (!working_bits) {
 			bits++, basepos += 64;
 			working_bits = ~(*bits);
 		}
+        bitpos = __builtin_ctzll(working_bits);
 		working_bits = (~working_bits) & (0xFFFFFFFFFFFFFFFF << bitpos);
 		runs->end_pos = short(basepos + bitpos);
 		runs->label = labelsolver.NewLabel();
@@ -82,7 +88,7 @@ out:
 
 		for (;; runs++) {
 			//find starting position
-			while (!_BitScanForward64(&bitpos, working_bits)) {
+			while (!working_bits) {
 				bits++, basepos += 64;
 				if (bits == bit_final) {
 					runs->start_pos = (short)0xFFFF;
@@ -92,14 +98,16 @@ out:
 				}
 				working_bits = *bits;
 			}
+            bitpos = __builtin_ctzll(working_bits);
 			unsigned short start_pos = short(basepos + bitpos);
 
 			//find ending position
 			working_bits = (~working_bits) & (0xFFFFFFFFFFFFFFFF << bitpos);
-			while (!_BitScanForward64(&bitpos, working_bits)) {
+			while (!working_bits) {
 				bits++, basepos += 64;
 				working_bits = ~(*bits);
 			}
+            bitpos = __builtin_ctzll(working_bits);
 			working_bits = (~working_bits) & (0xFFFFFFFFFFFFFFFF << bitpos);
 			unsigned short end_pos = short(basepos + bitpos);
 
