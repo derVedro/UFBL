@@ -1,0 +1,25 @@
+#include <iostream>
+#include "Labeling_BMRS_8c_x64.h"
+
+const unsigned char __64x[] = {    // FUBAR → ○
+        0x00, 0x3e, 0x66, 0x78, 0x3e, 0x3e, 0x10, 0x00, 0x00, 0x30, 0x66, 0x68,
+        0x63, 0x33, 0x08, 0xe0, 0x00, 0x3c, 0x66, 0x7e, 0x63, 0x33, 0x7c, 0xa0,
+        0x00, 0x30, 0x66, 0x66, 0x7f, 0x3e, 0x08, 0xe0, 0x00, 0x30, 0x7e, 0x7e,
+        0x63, 0x33, 0x10, 0x00
+};
+const int height = 5;
+const int width = 64;
+unsigned int dest[height*width];
+
+
+int main(){
+    Labeling_BMRS_X64(dest, __64x, height, width);
+    long long label;
+    for (auto h = 0; h < height; ++h){
+        for (auto w = 0; w < width; ++w){
+            label = dest[h * width + w];
+            std::cout << ((label == 0) ? '.' : char('0' + (label + 16) % 61));
+        }
+        std::cout << std::endl;
+    }
+}
